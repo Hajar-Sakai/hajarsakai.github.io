@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hajar — Research & ML Engineering</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0d0f;
+      --surface: #13151a;
+      --border: #1e2128;
+      --accent: #c8a97e;
+      --accent2: #7eb8c8;
+      --text: #e8e4dc;
+      --muted: #7a7870;
+      --dim: #3a3830;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --mono: 'DM Mono', monospace;
+      --sans: 'Instrument Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.028;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.4rem 3rem;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    nav.scrolled {
+      background: rgba(12, 13, 15, 0.92);
+      backdrop-filter: blur(12px);
+      border-color: var(--border);
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-logo em { font-style: italic; color: var(--accent); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 0 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .hero-bg-lines::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -5%;
+      width: 55%;
+      height: 140%;
+      background: radial-gradient(ellipse at 60% 40%, rgba(200,169,126,0.06) 0%, transparent 65%),
+                  radial-gradient(ellipse at 80% 70%, rgba(126,184,200,0.04) 0%, transparent 55%);
+    }
+    .hero-grid-lines {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 50%;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at 70% 50%, black 20%, transparent 70%);
+      opacity: 0.4;
+    }
+
+    .hero-left { padding-right: 4rem; animation: fadeUp 0.9s ease both; }
+    .hero-right {
+      position: relative;
+      animation: fadeUp 0.9s 0.15s ease both;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 2rem;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.8rem;
+      color: var(--text);
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+      font-weight: 300;
+    }
+    h1 span.outline {
+      -webkit-text-stroke: 1px var(--dim);
+      color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 36ch;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+
+    .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.85rem 2rem;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-ghost {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* stat cards in hero */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .stat-card {
+      background: var(--surface);
+      padding: 1.8rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .stat-card:hover::after { transform: scaleX(1); }
+    .stat-num {
+      font-family: var(--serif);
+      font-size: 2.8rem;
+      font-weight: 300;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── SECTION WRAPPER ── */
+    section {
+      padding: 7rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+    .section-num {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    h2 em { font-style: italic; color: var(--accent); }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── ABOUT ── */
+    #about { border-top: 1px solid var(--border); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .about-body p {
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+      line-height: 1.85;
+    }
+    .about-body p strong { color: var(--text); font-weight: 500; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .tag:hover { border-color: var(--accent2); color: var(--accent2); }
+    .about-sidebar {}
+    .sidebar-block {
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .sidebar-block h4 {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .sidebar-block ul { list-style: none; }
+    .sidebar-block li {
+      font-size: 0.88rem;
+      color: var(--muted);
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .sidebar-block li:last-child { border-bottom: none; }
+    .sidebar-block li::before {
+      content: '→';
+      color: var(--accent);
+      font-size: 0.75rem;
+    }
+
+    /* ── RESEARCH ── */
+    #research { border-top: 1px solid var(--border); }
+    .papers-list { display: flex; flex-direction: column; gap: 0; }
+    .paper-item {
+      display: grid;
+      grid-template-columns: 3rem 1fr auto;
+      gap: 1.5rem;
+      align-items: start;
+      padding: 2rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+      position: relative;
+    }
+    .paper-item:first-child { border-top: 1px solid var(--border); }
+    .paper-item:hover { background: rgba(200,169,126,0.02); }
+    .paper-num {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--dim);
+      padding-top: 0.25rem;
+      letter-spacing: 0.08em;
+    }
+    .paper-body {}
+    .paper-title {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+      line-height: 1.35;
+    }
+    .paper-venue {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .paper-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      max-width: 65ch;
+      line-height: 1.7;
+    }
+    .paper-badge {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--accent2);
+      color: var(--accent2);
+      white-space: nowrap;
+      height: fit-content;
+    }
+
+    /* ── PROJECTS ── */
+    #projects { border-top: 1px solid var(--border); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+    .project-card {
+      background: var(--surface);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s;
+    }
+    .project-card:hover { background: #161820; }
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 0;
+      background: var(--accent);
+      transition: height 0.35s ease;
+    }
+    .project-card:hover::before { height: 100%; }
+    .project-icon {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .project-icon-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .project-name {
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+    .project-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+    .project-stack { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .stack-pill {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.55rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--dim);
+      text-transform: uppercase;
+    }
+
+    /* ── CONTACT ── */
+    #contact { border-top: 1px solid var(--border); text-align: center; }
+    .contact-inner { max-width: 600px; margin: 0 auto; }
+    .contact-pre {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+    .contact-heading {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 300;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+    .contact-heading em { font-style: italic; color: var(--accent); }
+    .contact-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 3rem;
+    }
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .contact-link {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.2rem;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .contact-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-text {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 1.5rem; }
+      #hero { grid-template-columns: 1fr; min-height: auto; padding: 7rem 1.5rem 4rem; gap: 3rem; }
+      .hero-left { padding-right: 0; }
+      section { padding: 5rem 1.5rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .projects-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a class="nav-logo" href="#">Hajar <em>E.</em></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div id="hero">
+    <div class="hero-bg-lines">
+      <div class="hero-grid-lines"></div>
+    </div>
+
+    <div class="hero-left">
+      <div class="hero-eyebrow">PhD · Analytics Developer · NLP Researcher</div>
+      <h1>
+        Building systems<br>
+        at the edge of<br>
+        <em>language</em> &amp; <span class="outline">data.</span>
+      </h1>
+      <p class="hero-desc">
+        I design production ML pipelines and publish research on LLM uncertainty,
+        multi-label classification, and healthcare NLP — bridging academic rigor
+        with real-world deployment.
+      </p>
+      <div class="hero-ctas">
+        <a href="#research" class="btn-primary">View Research</a>
+        <a href="#projects" class="btn-ghost">Explore Projects</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-stats">
+        <div class="stat-card">
+          <div class="stat-num">14+</div>
+          <div class="stat-label">Publications</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">50+</div>
+          <div class="stat-label">Citations</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">PhD</div>
+          <div class="stat-label">Industrial &amp; Systems Eng.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">∞</div>
+          <div class="stat-label">Models Shipped</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-header reveal">
+      <span class="section-num">01</span>
+      <h2>About <em>Me</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-body reveal">
+        <p>
+          I'm an <strong>Analytics Developer at Cooper University Health Care</strong>
+          and an independent researcher specializing in large language models,
+          uncertainty quantification, and NLP for clinical and financial domains.
+        </p>
+        <p>
+          My PhD in <strong>Industrial and Systems Engineering</strong> and
+          Master's in Finance from <strong>Paris Dauphine</strong> give me an
+          unusual vantage point: I think about systems, uncertainty, and
+          optimization simultaneously across both technical and economic layers.
+        </p>
+        <p>
+          In production I've built a hospital-policies RAG chatbot (ChromaDB +
+          Azure OpenAI), a call-mining quality pipeline processing thousands of
+          recordings monthly, and a suite of forecasting tools. In research I
+          treat LLM stochasticity as <em>signal</em>, not noise.
+        </p>
+        <div class="tag-list">
+          <span class="tag">LLM Uncertainty</span>
+          <span class="tag">Healthcare NLP</span>
+          <span class="tag">Multi-label Classification</span>
+          <span class="tag">RAG Systems</span>
+          <span class="tag">Conformal Prediction</span>
+          <span class="tag">Financial ML</span>
+          <span class="tag">Azure OpenAI</span>
+          <span class="tag">Python</span>
+        </div>
+      </div>
+      <div class="about-sidebar reveal">
+        <div class="sidebar-block">
+          <h4>Education</h4>
+          <ul>
+            <li>PhD · Industrial &amp; Systems Engineering</li>
+            <li>MSc Finance · Paris Dauphine</li>
+          </ul>
+        </div>
+        <div class="sidebar-block">
+          <h4>Current Role</h4>
+          <ul>
+            <li>Analytics Developer · Cooper University Health Care</li>
+            <li>Independent ML Researcher</li>
+          </ul>
+        </div>
+        <div class="sidebar-block">
+          <h4>Research Interests</h4>
+          <ul>
+            <li>LLM stochasticity as latent signal</li>
+            <li>Lookahead bias in financial LLMs</li>
+            <li>Bayesian NLP for clinical text</li>
+            <li>Multi-label text classification</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEARCH -->
+  <section id="research">
+    <div class="section-header reveal">
+      <span class="section-num">02</span>
+      <h2>Selected <em>Research</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="papers-list">
+
+      <div class="paper-item reveal">
+        <div class="paper-num">01</div>
+        <div class="paper-body">
+          <div class="paper-venue">JMIR AI · 2026</div>
+          <div class="paper-title">LLMs for Healthcare Text Classification: A Systematic Review</div>
+          <div class="paper-desc">Comprehensive systematic review mapping the landscape of large language model applications in clinical and healthcare text classification, synthesizing evidence across benchmarks, architectures, and deployment contexts.</div>
+        </div>
+        <div class="paper-badge">Published</div>
+      </div>
+
+      <div class="paper-item reveal">
+        <div class="paper-num">02</div>
+        <div class="paper-body">
+          <div class="paper-venue">IISE 2026 · Conference</div>
+          <div class="paper-title">Bayesian Latent Variable Modeling of LLM Stochasticity</div>
+          <div class="paper-desc">A novel framing that treats temperature-induced variance in LLM outputs as a structured latent signal rather than noise, integrated with conformal prediction for calibrated uncertainty bounds.</div>
+        </div>
+        <div class="paper-badge">Forthcoming</div>
+      </div>
+
+      <div class="paper-item reveal">
+        <div class="paper-num">03</div>
+        <div class="paper-body">
+          <div class="paper-venue">Working Paper</div>
+          <div class="paper-title">Lookahead Bias in Financial LLMs</div>
+          <div class="paper-desc">Investigating temporal leakage in LLM-based financial forecasting — identifying conditions under which training data leads to systematically optimistic backtests and proposing evaluation protocols to surface hidden bias.</div>
+        </div>
+        <div class="paper-badge">In Progress</div>
+      </div>
+
+      <div class="paper-item reveal">
+        <div class="paper-num">04</div>
+        <div class="paper-body">
+          <div class="paper-venue">Multi-venue · 2023–2025</div>
+          <div class="paper-title">QUAD-LLM-MLTC / KDH-MLTC / HAMLET Frameworks</div>
+          <div class="paper-desc">A family of multi-label text classification frameworks combining ensemble LLM prompting, knowledge distillation, and hierarchical label structures — demonstrated on clinical and biomedical corpora.</div>
+        </div>
+        <div class="paper-badge">14+ Papers</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <span class="section-num">03</span>
+      <h2>Industry <em>Projects</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-grid reveal">
+
+      <div class="project-card">
+        <div class="project-icon"><div class="project-icon-dot"></div>Production · Healthcare</div>
+        <div class="project-name">Cooper Policies RAG Chatbot</div>
+        <div class="project-desc">End-to-end retrieval-augmented generation system over 178 hospital policy documents. Features multi-intent routing (semantic / index / clinical-links paths), delta indexing, inline citations, and Azure OpenAI embeddings.</div>
+        <div class="project-stack">
+          <span class="stack-pill">ChromaDB</span>
+          <span class="stack-pill">Azure OpenAI</span>
+          <span class="stack-pill">Streamlit</span>
+          <span class="stack-pill">Python</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-icon"><div class="project-icon-dot"></div>Production · Analytics</div>
+        <div class="project-name">Call Mining &amp; Quality Pipeline</div>
+        <div class="project-desc">Automated pipeline processing thousands of monthly call recordings via Azure Blob Storage and OpenAI Whisper transcription. Stratified sampling and LLM scoring across 9 quality dimensions for the Patient Access Center.</div>
+        <div class="project-stack">
+          <span class="stack-pill">Azure Blob</span>
+          <span class="stack-pill">Whisper</span>
+          <span class="stack-pill">LLM Scoring</span>
+          <span class="stack-pill">Fabric</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-icon"><div class="project-icon-dot"></div>Research Tool</div>
+        <div class="project-name">Topic Research Crawler</div>
+        <div class="project-desc">Autonomous research crawler with GitHub Actions scheduling, SQLite persistence, SendGrid digests, and a wiki-compounding knowledge layer. Surfaces and synthesizes emerging papers across defined topic trees.</div>
+        <div class="project-stack">
+          <span class="stack-pill">GitHub Actions</span>
+          <span class="stack-pill">SQLite</span>
+          <span class="stack-pill">SendGrid</span>
+          <span class="stack-pill">Python</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-icon"><div class="project-icon-dot"></div>Finance · NLP</div>
+        <div class="project-name">10-K Sentiment Analyzer</div>
+        <div class="project-desc">Technical assessment combining Loughran-McDonald financial lexicon with LLM-based sentiment analysis on 10-K filings. Designed to surface tone shifts predictive of firm-level risk across reporting periods.</div>
+        <div class="project-stack">
+          <span class="stack-pill">LM Lexicon</span>
+          <span class="stack-pill">LLM</span>
+          <span class="stack-pill">NLP</span>
+          <span class="stack-pill">Python</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-icon"><div class="project-icon-dot"></div>ML · Forecasting</div>
+        <div class="project-name">Provider Star Rating Model</div>
+        <div class="project-desc">End-to-end ML workflow for provider performance prediction and star rating at Cooper. Combines structured EHR features with NLP signals from patient feedback, with statistical significance testing throughout.</div>
+        <div class="project-stack">
+          <span class="stack-pill">Scikit-learn</span>
+          <span class="stack-pill">NLP</span>
+          <span class="stack-pill">Statistics</span>
+          <span class="stack-pill">Fabric</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-icon"><div class="project-icon-dot"></div>Infrastructure</div>
+        <div class="project-name">Azure Lakehouse Ingestion</div>
+        <div class="project-desc">Microsoft Fabric / Azure Lakehouse data ingestion framework for call metadata, enabling downstream analytics, SharePoint-to-Blob pipelines, and integration with Azure AI Foundry agent deployment.</div>
+        <div class="project-stack">
+          <span class="stack-pill">Azure</span>
+          <span class="stack-pill">Fabric</span>
+          <span class="stack-pill">SharePoint</span>
+          <span class="stack-pill">PySpark</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-inner reveal">
+      <div class="contact-pre">Let's connect</div>
+      <h2 class="contact-heading">Open to <em>research</em><br>collaborations &amp; roles.</h2>
+      <p class="contact-sub">
+        I'm interested in academic positions, research collaborations, and
+        senior ML/NLP industry roles at the intersection of language models and high-stakes domains.
+      </p>
+      <div class="contact-links">
+        <a href="mailto:your@email.com" class="contact-link">Email</a>
+        <a href="https://github.com/yourusername" class="contact-link" target="_blank">GitHub</a>
+        <a href="https://linkedin.com/in/yourusername" class="contact-link" target="_blank">LinkedIn</a>
+        <a href="https://scholar.google.com" class="contact-link" target="_blank">Google Scholar</a>
+        <a href="/cv.pdf" class="contact-link">Download CV</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-text">© 2026 Hajar E. — All rights reserved</span>
+    <span class="footer-text">Built with HTML · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>
+    // Sticky nav
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

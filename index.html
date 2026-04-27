@@ -8,20 +8,19 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg: #0c0d0f;
-      --surface: #13151a;
-      --border: #1e2128;
-      --accent: #c8a97e;
-      --accent2: #7eb8c8;
-      --text: #e8e4dc;
-      --muted: #7a7870;
-      --dim: #3a3830;
-      --serif: 'Cormorant Garamond', Georgia, serif;
-      --mono: 'DM Mono', monospace;
-      --sans: 'Instrument Sans', sans-serif;
-    }
-
+   :root {
+  --bg: #f5ede0;
+  --surface: #ede4d4;
+  --border: #d4c8b8;
+  --accent: #4a7c59;
+  --accent2: #2e7d82;
+  --text: #1a1208;
+  --muted: #6a5c48;
+  --dim: #b0a090;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --mono: 'DM Mono', monospace;
+  --sans: 'Instrument Sans', sans-serif;
+}
     html { scroll-behavior: smooth; }
 
     body {
@@ -57,7 +56,7 @@
       transition: border-color 0.3s, background 0.3s;
     }
     nav.scrolled {
-      background: rgba(12, 13, 15, 0.92);
+      background: rgba(245, 237, 224, 0.92);
       backdrop-filter: blur(12px);
       border-color: var(--border);
     }
@@ -105,8 +104,8 @@
       right: -5%;
       width: 55%;
       height: 140%;
-      background: radial-gradient(ellipse at 60% 40%, rgba(200,169,126,0.06) 0%, transparent 65%),
-                  radial-gradient(ellipse at 80% 70%, rgba(126,184,200,0.04) 0%, transparent 55%);
+      background: radial-gradient(ellipse at 60% 40%, rgba(74,124,89,0.07) 0%, transparent 65%),
+            radial-gradient(ellipse at 80% 70%, rgba(46,125,130,0.05) 0%, transparent 55%);
     }
     .hero-grid-lines {
       position: absolute;
@@ -283,6 +282,50 @@
       gap: 5rem;
       align-items: start;
     }
+    .about-grid {
+  display: grid;
+  grid-template-columns: 1fr 200px 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+  
+  .about-photo-col {
+  display: flex;
+  justify-content: center;
+  }
+  
+  .about-photo-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 200px;
+  }
+  
+  .about-photo-img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  border: 1px solid var(--border);
+  filter: grayscale(15%) sepia(10%);
+  transition: filter 0.3s ease;
+  }
+  
+  .about-photo-img:hover {
+  filter: grayscale(0%) sepia(0%);
+  }
+  
+  .about-photo-caption {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-align: center;
+  margin-top: 0.6rem;
+  }
+
+    
     .about-body p {
       color: var(--muted);
       margin-bottom: 1.25rem;
@@ -405,7 +448,7 @@
       overflow: hidden;
       transition: background 0.2s;
     }
-    .project-card:hover { background: #161820; }
+    .project-card:hover { background: #e8dece; }
     .project-card::before {
       content: '';
       position: absolute;
@@ -537,7 +580,8 @@
       #hero { grid-template-columns: 1fr; min-height: auto; padding: 7rem 1.5rem 4rem; gap: 3rem; }
       .hero-left { padding-right: 0; }
       section { padding: 5rem 1.5rem; }
-      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-photo-wrap { max-width: 160px; margin: 0 auto; }
       .projects-grid { grid-template-columns: 1fr; }
       footer { flex-direction: column; gap: 1rem; text-align: center; }
       .nav-links { display: none; }
@@ -588,7 +632,7 @@
           <div class="stat-label">Publications</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num">80+</div>
+          <div class="stat-num">90</div>
           <div class="stat-label">Citations</div>
         </div>
         <div class="stat-card">
@@ -611,61 +655,69 @@
       <div class="section-line"></div>
     </div>
     <div class="about-grid">
-      <div class="about-body reveal">
-        <p>
-          I'm an <strong>Data Scientist at Cooper University Health Care</strong>
-          and an independent researcher specializing in large language models,
-          uncertainty quantification, and NLP for clinical and financial domains.
-        </p>
-        <p>
-          My PhD in <strong>Industrial and Systems Engineering</strong> and
-          Master's in Finance from <strong>Paris Dauphine</strong> give me an
-          unusual vantage point: I think about systems, uncertainty, and
-          optimization simultaneously across both technical and economic layers.
-        </p>
-        <p>
-          In production I've built a hospital-policies RAG chatbot (ChromaDB +
-          Azure OpenAI), a call-mining quality pipeline processing thousands of
-          recordings monthly, and a suite of forecasting tools. In research I
-          treat LLM stochasticity as <em>signal</em>, not noise.
-        </p>
-        <div class="tag-list">
-          <span class="tag">LLM Uncertainty</span>
-          <span class="tag">Healthcare NLP</span>
-          <span class="tag">Multi-label Classification</span>
-          <span class="tag">RAG Systems</span>
-          <span class="tag">Conformal Prediction</span>
-          <span class="tag">Financial ML</span>
-          <span class="tag">Azure OpenAI</span>
-          <span class="tag">Python</span>
-        </div>
-      </div>
-      <div class="about-sidebar reveal">
-        <div class="sidebar-block">
-          <h4>Education</h4>
-          <ul>
-            <li>PhD · Industrial &amp; Systems Engineering</li>
-            <li>MSc Finance · Paris Dauphine</li>
-          </ul>
-        </div>
-        <div class="sidebar-block">
-          <h4>Current Role</h4>
-          <ul>
-            <li>Data Scientist · Cooper University Health Care</li>
-            <li>Independent ML Researcher</li>
-          </ul>
-        </div>
-        <div class="sidebar-block">
-          <h4>Research Interests</h4>
-          <ul>
-            <li>LLM stochasticity as latent signal</li>
-            <li>Lookahead bias in financial LLMs</li>
-            <li>Bayesian NLP for clinical text</li>
-            <li>Multi-label text classification</li>
-          </ul>
-        </div>
-      </div>
+  <div class="about-body reveal">
+    <p>
+      I'm an <strong>Data Scientist at Cooper University Health Care</strong>
+      and an independent researcher specializing in large language models,
+      uncertainty quantification, and NLP for clinical and financial domains.
+    </p>
+    <p>
+      My PhD in <strong>Industrial and Systems Engineering</strong> and
+      Master's in Finance from <strong>Paris Dauphine</strong> give me an
+      unusual vantage point: I think about systems, uncertainty, and
+      optimization simultaneously across both technical and economic layers.
+    </p>
+    <p>
+      In production I've built a hospital-policies RAG chatbot (ChromaDB +
+      Azure OpenAI), a call-mining quality pipeline processing thousands of
+      recordings monthly, and a suite of forecasting tools. In research I
+      treat LLM stochasticity as <em>signal</em>, not noise.
+    </p>
+    <div class="tag-list">
+      <span class="tag">LLM Uncertainty</span>
+      <span class="tag">Healthcare NLP</span>
+      <span class="tag">Multi-label Classification</span>
+      <span class="tag">RAG Systems</span>
+      <span class="tag">Conformal Prediction</span>
+      <span class="tag">Financial ML</span>
+      <span class="tag">Azure OpenAI</span>
+      <span class="tag">Python</span>
     </div>
+  </div>
+
+  <div class="about-photo-col reveal">
+    <div class="about-photo-wrap">
+      <img src="profile.png" alt="Hajar Sakai" class="about-photo-img" />
+      <div class="about-photo-caption">Hajar Sakai</div>
+    </div>
+  </div>
+
+  <div class="about-sidebar reveal">
+    <div class="sidebar-block">
+      <h4>Education</h4>
+      <ul>
+        <li>PhD · Industrial &amp; Systems Engineering</li>
+        <li>MSc Finance · Paris Dauphine</li>
+      </ul>
+    </div>
+    <div class="sidebar-block">
+      <h4>Current Role</h4>
+      <ul>
+        <li>Data Scientist · Cooper University Health Care</li>
+        <li>Independent ML Researcher</li>
+      </ul>
+    </div>
+    <div class="sidebar-block">
+      <h4>Research Interests</h4>
+      <ul>
+        <li>LLM stochasticity as latent signal</li>
+        <li>Lookahead bias in financial LLMs</li>
+        <li>Bayesian NLP for clinical text</li>
+        <li>Multi-label text classification</li>
+      </ul>
+    </div>
+  </div>
+</div>
   </section>
 
   <!-- RESEARCH -->
